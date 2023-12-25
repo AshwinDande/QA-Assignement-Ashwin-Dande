@@ -1,0 +1,328 @@
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.testng.Assert;
+ 
+import java.util.concurrent.TimeUnit;
+ 
+public class LoginTest {
+    public static void main(String[] args) {
+
+
+public static String Btn_logIn="//button[text()='Log in']";
+
+	public static String Btn_ok="//button[text()='Okay']";
+
+	public static String Btn_resetPassword="//button[text()='Reset Password']";
+
+	public static String input_email="//input[@id='email']";
+
+	public static String input_UserName="//input[@id='username']";
+
+	public static String txt_gmailInbox="//span[text()='Inbox']";
+
+	public static String input_registeredEmail="//input[@id='Enter your registered email address']";
+	public static String input_Password="//input[@id=‘password]";
+
+	public static String input_newPassword="//input[@id=‘newPassword]";
+
+    public static String input_confirmPassword="//input[@id=‘confirmPassword]";
+
+	public static String link_forgottenPassword="//a[text()='Forgotten Password?']";
+
+	public static String msg_invalidCred="//*[text()=“Invalid Credentials. Please Login again. “]";
+
+	public static String msg_emailPasswordChanged="Your password has been changed successfully. please wait redirecting to login page";
+
+	public static String Btn_recoverPassword="//button[text()=‘Recover Password’]";
+
+	public static String msg_recoveryinstructions="//*[text()=“Email with password recovery instructions has been sent“]";
+
+	public static String sub_email="//*[contains(text(),“Password Recovery Instructions”]";
+
+	public static String link_gmailEmailBody="//*[contains(text(),“/recovery-instructions/help”]";
+
+	public static String valid_gmailUserName="ashwindande@hp.com";
+	public static String valid_gmailPassword="ashwin@1234";
+
+	public static String valid_UserName1="ashwindande@hp.com";
+	public static String valid_Password1="ashwin@123";
+
+	public static String valid_newPassword="Dande@1234";
+
+	public static String invalid_UserName2="username@hp.com";
+
+	public static String invalid_Password2="password@321";
+
+	public static String invalid_UserName3="invalidUsername@BHP.com";
+
+	public static String invalid_Password3="invalidPassword@554";
+
+	public static String url = "https://www.QATestLoginPage.com//login";
+
+	String path = System.getProperty("user.dir");
+	System.out.println(path);
+	System.setProperty("webdriver.chrome.driver",path+"\\resources\\chromedriver.exe");
+
+	 WebDriver driver = new ChromeDriver();
+	WebDriverWait wait = new WebDriverWait(driver, timeout);
+
+
+        driver.get(url);
+        driver.manage().window().maximize();
+        driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+
+
+
+	String expectedTitle = "LogIn Page";
+	String actualTitle = driver.getTitle();
+
+	if (actualTitle.equals(expectedTitle))
+	{
+		testStepPassed("Login page is displayed");
+	}
+	else
+	{
+		testStepFailed("Login page is not displayed");
+	}
+
+	//Checking if login button is disabled on entering credentials
+	WebElement UserName = driver.findElement(By.xpath(input_UserName));
+	WebElement Password = driver.findElement(By.xpath(input_Password));
+	WebElement loginButton = driver.findElement(By.xpath(Btn_logIn));
+
+     String USValue=UserName.getAttribute("value");
+	String PassValue=Password.getAttribute("value");
+
+	if (USValue.isEmpty() && PassValue.isEmpty() )
+	{
+		boolean LoginbtnEnabled = driver.findElement(By.xpath(Btn_logIn)).isEnabled();
+
+			  if (LoginbtnEnabled==false)
+			  {
+				  testStepPassed("Login button is disabled");
+			  }
+			  else
+			  {
+				  testStepFailed("Login button is enabled");
+			  }
+
+
+	}
+
+	//Entering invalid credentials
+	UserName.sendKeys(invalid_UserName2);
+	Password.sendKeys(invalid_Password2);
+
+	boolean LoginbtnEnabled = driver.findElement(By.xpath(Btn_logIn)).isEnabled();
+
+	if (LoginbtnEnabled==true)
+	{
+		testStepPassed("Login button is enabled on entering credentials");
+	}
+	else
+	{
+		testStepFailed("Login button is disabled on entering credentials");
+	}
+
+
+	 System.out.println("Clicking login button");
+        loginButton.click();
+
+	Boolean invalidmsgisPresent = driver.findElements(By.xpath(msg_invalidCred)).size() > 0;
+
+	if (invalidmsgisPresent==true)
+	{
+		testStepPassed("Invalid credentials message is displayed for wrong credentials");
+
+		String USValue1=UserName.getAttribute("value");
+		String PassValue1=Password.getAttribute("value");
+
+		ArrayList<String>failedusername=new ArrayList<String>();
+		failedusername.add(USValue1);
+
+		ArrayList<String>failedpassword=new ArrayList<String>();
+		failedpassword.add(PassValue1);
+
+
+	}
+
+
+	//Entering valid credentials
+
+	UserName.clear();
+	Password.clear();
+	UserName.sendKeys(valid_UserName1);
+	Password.sendKeys(valid_Password1);
+
+	 System.out.println("Clicking login button");
+		loginButton.click();
+
+		driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+
+		String HomePage=driver.getTitle();
+
+		if (HomePage.contains("\\HomePage"))
+		{
+			testStepPassed("Home Page is displayed on entering valid credentials");
+		}
+		else
+		{
+			testStepFailed("Home Page is not displayed on entering valid credentials");
+		}
+
+
+//password recovery scenario
+
+	driver.navigate().to("https://www.QATestLoginPage.com//login"");
+	 WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(Btn_logIn)));
+
+	WebElement forgottenPassword = driver.findElement(By.xpath(link_forgottenPassword));
+	 forgottenPassword.click();
+
+	 //entering invalid username
+	 UserName.clear();
+	 Password.clear();
+	 UserName.sendKeys(invalid_UserName3);
+	 Password.sendKeys(invalid_Password3);
+
+	 System.out.println("Clicking recover password button");
+	 WebElement recoverPassword = driver.findElement(By.xpath(Btn_recoverPassword));
+	 recoverPassword.click();
+
+	 driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+
+	String RecoveryPage=driver.getTitle();
+
+		if (RecoveryPage.contains("\\PasswordRecoveryPage"))
+		{
+			testStepPassed("Password Recovery Page is displayed on clicking Forgot Password link");
+		}
+		else
+		{
+			testStepFailed("Failed to load Password Recovery Page on clicking Forgot Password link");
+		}
+
+
+		WebElement RegistrationEmail = driver.findElement(By.xpath(input_registeredEmail));
+
+		RegistrationEmail.sendKeys(valid_UserName1);
+
+		 System.out.println("Clicking recover password button");
+		 WebElement recoverPassword = driver.findElement(By.xpath(Btn_recoverPassword));
+		 recoverPassword.click();
+
+		 driver.manage().timeouts().pageLoadTimeout(4, TimeUnit.SECONDS);
+
+		 wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(recoverymsgEmailisPresent)));
+	     Boolean recoverymsgEmailisPresent = driver.findElements(By.xpath(msg_recoveryinstructions)).size() > 0;
+
+	 if (recoverymsgEmailisPresent==true)
+	 {
+		 testStepPassed("Recovery instructions message is displayed for valid email id");
+	 }
+	 else
+	 {
+		 testStepFailed("Recovery instructions message is not displayed");
+
+	 }
+
+	 driver.navigate().to("https://www.gmail.com//login"");
+
+	 WebElement gmailUserName = driver.findElement(By.xpath(input_email));
+	 WebElement gmailPassword = driver.findElement(By.xpath(input_Password));
+	 WebElement gmailLoginButton = driver.findElement(By.xpath(Btn_logIn));
+
+	 gmailUserName.sendKeys(valid_gmailUserName);
+	 gmailPassword.sendKeys(valid_gmailPassword);
+	 gmailLoginButton.click();
+	 driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+
+	 WebElement gmailInbox = driver.findElement(By.xpath(txt_gmailInbox));
+
+	 gmailInbox.click();
+
+
+	 wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(sub_email)));
+
+	WebElement SubjectEmail = driver.findElement(By.xpath(sub_email));
+
+	 SubjectEmail.click();
+	 driver.manage().timeouts().pageLoadTimeout(4, TimeUnit.SECONDS);
+
+	 WebElement gmailEmailBody = driver.findElement(By.xpath(link_gmailEmailBody));
+
+	 //retriving the instructions from the email body
+	 String instructions=gmailEmailBody.getText();
+
+	 //splitting the instructions to get the link
+
+	 String[] parts = instructions.split("href=");
+	 String part1 = parts[0]; // href link text
+	 String link_recovery=part1.substring(part1.lastIndexOf("http"), part1.lastIndexOf(" "));
+
+	 //navigating to the link
+	 driver.navigate().to(link_recovery);
+
+	 //entering new password
+	 WebElement newPassword = driver.findElement(By.xpath(input_newPassword));
+	 WebElement confirmPassword = driver.findElement(By.xpath(input_confirmPassword));
+	 WebElement resetPassword = driver.findElement(By.xpath(Btn_resetPassword));
+
+	 newPassword.sendKeys(valid_newPassword);
+	 confirmPassword.sendKeys(valid_newPassword);
+	 resetPassword.click();
+
+	 WebElement PasswordChanged=driver.findElement(By.xpath(msg_emailPasswordChanged));
+
+	 if (PasswordChanged.isDisplayed())
+	 {
+		 testStepPassed("Password changed message is displayed");
+	 }
+	 else
+	 {
+		 testStepFailed("Password changed message is not displayed");
+	 }
+
+	 //waiting to redirect to login page
+	 driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+
+	 if (loginButton.isDisplayed())
+	{
+		testStepPassed("Successfully redirected to login page");
+	}
+	 else
+	{
+		testStepFailed("Failed to redirect to login page");
+	}
+
+
+	 //entering new credentials
+
+	 UserName.clear();
+	 Password.clear();
+	 UserName.sendKeys(valid_UserName1);
+	 Password.sendKeys(valid_newPassword);
+
+	 System.out.println("Clicking login button");
+	 loginButton.click();
+	driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+
+	String HomePage=driver.getTitle();
+
+	if (HomePage.contains("\\HomePage"))
+	{
+		testStepPassed("Home Page is displayed on entering New credentials");
+	}
+	else
+
+	{
+		testStepFailed("Failed to load Home Page on entering New credentials");
+
+	}
+
+
+driver.quit();
+
+}
